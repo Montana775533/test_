@@ -1,0 +1,910 @@
+Here, name the file as config.php
+
+<?php
+
+$servername = "localhost";
+
+$username = "root"; 
+
+$password = ""; 
+
+$dbname = "mydb"; 
+
+$conn = new mysqli($servername, $username, $password, $dbname);
+
+if ($conn->connect_error) {
+
+    die("Connection failed: " . $conn->connect_error);
+
+}
+
+?> 
+
+How to Create Records?
+The first operation in PHP CRUD Operations, Create, is responsible for creating tables or new records into an existing table. To do that, first, you must write the code for the webpage to create an entry in the database. 
+
+Name the file as create.php.
+
+<?php 
+
+include "config.php";
+
+  if (isset($_POST['submit'])) {
+
+    $first_name = $_POST['firstname'];
+
+    $last_name = $_POST['lastname'];
+
+    $email = $_POST['email'];
+
+    $password = $_POST['password'];
+
+    $gender = $_POST['gender'];
+
+    $sql = "INSERT INTO `users`(`firstname`, `lastname`, `email`, `password`, `gender`) VALUES ('$first_name','$last_name','$email','$password','$gender')";
+
+    $result = $conn->query($sql);
+
+    if ($result == TRUE) {
+
+      echo "New record created successfully.";
+
+    }else{
+
+      echo "Error:". $sql . "<br>". $conn->error;
+
+    } 
+
+    $conn->close(); 
+
+  }
+
+?>
+
+<!DOCTYPE html>
+
+<html>
+
+<body>
+
+<h2>Signup Form</h2>
+
+<form action="" method="POST">
+
+  <fieldset>
+
+    <legend>Personal information:</legend>
+
+    First name:<br>
+
+    <input type="text" name="firstname">
+
+    <br>
+
+    Last name:<br>
+
+    <input type="text" name="lastname">
+
+    <br>
+
+    Email:<br>
+
+    <input type="email" name="email">
+
+    <br>
+
+    Password:<br>
+
+    <input type="password" name="password">
+
+    <br>
+
+    Gender:<br>
+
+    <input type="radio" name="gender" value="Male">Male
+
+    <input type="radio" name="gender" value="Female">Female
+
+    <br><br>
+
+    <input type="submit" name="submit" value="submit">
+
+  </fieldset>
+
+</form>
+
+</body>
+
+</html>
+
+This page displays a signup form that stores the details entered on the page into the table named ‘users’.
+
+PHP_CRUD_1.
+
+How to Read/View Records?
+The second operation, just as the name suggests, ‘Read’ is used to display or read the data that is already available in the database.
+
+To perform the operation, you need to create a page that displays the records from the table ‘users’.
+
+Now, name the page as view.php
+
+<?php 
+
+include "config.php";
+
+$sql = "SELECT * FROM users";
+
+$result = $conn->query($sql);
+
+?>
+
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+    <title>View Page</title>
+
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.0/css/bootstrap.min.css">
+
+</head>
+
+<body>
+
+    <div class="container">
+
+        <h2>users</h2>
+
+<table class="table">
+
+    <thead>
+
+        <tr>
+
+        <th>ID</th>
+
+        <th>First Name</th>
+
+        <th>Last Name</th>
+
+        <th>Email</th>
+
+        <th>Gender</th>
+
+        <th>Action</th>
+
+    </tr>
+
+    </thead>
+
+    <tbody> 
+
+        <?php
+
+            if ($result->num_rows > 0) {
+
+                while ($row = $result->fetch_assoc()) {
+
+        ?>
+
+                    <tr>
+
+                    <td><?php echo $row['id']; ?></td>
+
+                    <td><?php echo $row['firstname']; ?></td>
+
+                    <td><?php echo $row['lastname']; ?></td>
+
+                    <td><?php echo $row['email']; ?></td>
+
+                    <td><?php echo $row['gender']; ?></td>
+
+                    <td><a class="btn btn-info" href="update.php?id=<?php echo $row['id']; ?>">Edit</a>&nbsp;<a class="btn btn-danger" href="delete.php?id=<?php echo $row['id']; ?>">Delete</a></td>
+
+                    </tr>                       
+
+        <?php       }
+
+            }
+
+        ?>                
+
+    </tbody>
+
+</table>
+
+    </div> 
+
+</body>
+
+</html>
+
+PHP_CRUD_2.
+
+How to Update Records?
+The third operation i.e, ‘update’ is used to change or modify the already existing data present in the database.
+
+To do this, you need to create another page to update the details in the database. Here, name the page as update.php
+
+<?php 
+
+include "config.php";
+
+    if (isset($_POST['update'])) {
+
+        $firstname = $_POST['firstname'];
+
+        $user_id = $_POST['user_id'];
+
+        $lastname = $_POST['lastname'];
+
+        $email = $_POST['email'];
+
+        $password = $_POST['password'];
+
+        $gender = $_POST['gender']; 
+
+        $sql = "UPDATE `users` SET `firstname`='$firstname',`lastname`='$lastname',`email`='$email',`password`='$password',`gender`='$gender' WHERE `id`='$user_id'"; 
+
+        $result = $conn->query($sql); 
+
+        if ($result == TRUE) {
+
+            echo "Record updated successfully.";
+
+        }else{
+
+            echo "Error:" . $sql . "<br>" . $conn->error;
+
+        }
+
+    } 
+
+if (isset($_GET['id'])) {
+
+    $user_id = $_GET['id']; 
+
+    $sql = "SELECT * FROM `users` WHERE `id`='$user_id'";
+
+    $result = $conn->query($sql); 
+
+    if ($result->num_rows > 0) {        
+
+        while ($row = $result->fetch_assoc()) {
+
+            $first_name = $row['firstname'];
+
+            $lastname = $row['lastname'];
+
+            $email = $row['email'];
+
+            $password  = $row['password'];
+
+            $gender = $row['gender'];
+
+            $id = $row['id'];
+
+        } 
+
+    ?>
+
+        <h2>User Update Form</h2>
+
+        <form action="" method="post">
+
+          <fieldset>
+
+            <legend>Personal information:</legend>
+
+            First name:<br>
+
+            <input type="text" name="firstname" value="<?php echo $first_name; ?>">
+
+            <input type="hidden" name="user_id" value="<?php echo $id; ?>">
+
+            <br>
+
+            Last name:<br>
+
+            <input type="text" name="lastname" value="<?php echo $lastname; ?>">
+
+            <br>
+
+            Email:<br>
+
+            <input type="email" name="email" value="<?php echo $email; ?>">
+
+            <br>
+
+            Password:<br>
+
+            <input type="password" name="password" value="<?php echo $password; ?>">
+
+            <br>
+
+            Gender:<br>
+
+            <input type="radio" name="gender" value="Male" <?php if($gender == 'Male'){ echo "checked";} ?> >Male
+
+            <input type="radio" name="gender" value="Female" <?php if($gender == 'Female'){ echo "checked";} ?>>Female
+
+            <br><br>
+
+            <input type="submit" value="Update" name="update">
+
+          </fieldset>
+
+        </form> 
+
+        </body>
+
+        </html> 
+
+    <?php
+
+    } else{ 
+
+        header('Location: view.php');
+
+    } 
+
+}
+
+?> 
+
+In the update form, we need to select the user id which we want to update. You can notice that the user id being updated is visible in the URL of the update page in the picture below.
+
+PHP_CRUD_3.
+
+You can view the updated details by opening the view.php webpage.
+
+PHP_CRUD_4
+
+How to Delete Records?
+The last operation of CRUD is Delete and just as the name suggests, it is used to delete an existing entry or table. 
+
+To perform this operation, you must create a page that would let you choose the data entry that you want to delete from the database.
+
+Now, name the file delete.php
+
+<?php 
+
+include "config.php"; 
+
+if (isset($_GET['id'])) {
+
+    $user_id = $_GET['id'];
+
+    $sql = "DELETE FROM `users` WHERE `id`='$user_id'";
+
+     $result = $conn->query($sql);
+
+     if ($result == TRUE) {
+
+        echo "Record deleted successfully.";
+
+    }else{
+
+        echo "Error:" . $sql . "<br>" . $conn->error;
+
+    }
+
+} 
+
+?>
+
+PHP_CRUD_5.
+
+PHP_CRUD_6
+
+Looking forward to becoming a PHP Developer? Then get certified with the Advanced PHP Development Course. Enroll now!
+Conclusion
+This brings us to the end of the “PHP CRUD Operations'' tutorial. In this, you have learned how to perform CRUD operations on a database with the help of PHP by creating, reading, updating, and deleting records using different web pages. Finally, you created a config.php file to connect the web pages with the database to perform the operations.
+
+You can refer here for a video tutorial on CRUD Operations.
+
+Are you planning to take the plunge and do a course on PHP? In that case, Simplilearn’s PHP course would be an excellent choice. The PHP certification covers all the fundamental and advanced concepts in PHP, making your journey towards learning PHP an easy one.
+
+If you have any queries regarding PHP CRUD Operations, do mention them in the comment section of this tutorial, and we’ll have our experts answer them for you.
+
+Happy Learning! 
+
+
+-------------------------------------------------------------------------------------------------
+
+
+Example of POST Method Code
+To understand how $_POST collects data, create a simple FORM with two fields - Name and Age, and collect and display that data using the POST Method.
+
+<?php
+
+   if(isset($_POST["name"]) || isset($_POST["age"]) ) {
+
+      if (preg_match("/[^A-Za-z'-]/",$_POST['name'] )) {
+
+         die ("invalid name and name should be alpha");
+
+      }
+
+      echo "Hello ". $_POST['name']. "<br />";
+
+      echo "Age: ". $_POST['age']. " years old.";    
+
+      exit();
+
+   }
+
+?>
+
+<html>
+
+   <body> 
+
+      <form action = "<?php $_PHP_SELF ?>" method = "POST">
+
+         Name: <input type = "text" name = "name" />
+
+         Age: <input type = "text" name = "age" />
+
+         <input type = "submit" />
+
+      </form> 
+
+   </body>
+
+</html>
+
+In the above code, the form method has been set to “POST” while the PHP script collects the form data using the super global variable $_POST.
+
+Below is the form with the Name and Age fields. Notice the URL before submitting the form does not contain any information.
+
+PHP_Post_Method_1.
+
+Now, look at the URL of the webpage. The POST Method, as discussed earlier, does not display any information on the URL, instead, the encoded data is embedded in the body of the HTTP request.
+
+PHP_Post_Method_2
+
+This is how the POST Method is used to collect and display information.
+
+Looking forward to becoming a PHP Developer? Then get certified with the Advanced PHP Development Course. Enroll now!
+Conclusion
+This brings us to the end of the “PHP POST Method” tutorial. In this, you have learned what the POST method is, and the $_POST superglobal variable. The advantages and disadvantages of using this method. You looked at the difference between GET and POST Methods and finally an example of how the POST Method is used with the help of a simple HTML FORM.
+
+You can refer here for a video tutorial on the GET & POST Methods.
+
+Are you planning to take the plunge and do a course on PHP? In that case, Simplilearn’s PHP course would be an excellent choice. The PHP certification covers all the fundamental and advanced concepts in PHP, making your journey towards learning PHP an easy one.
+
+If you have any queries regarding the PHP POST Method tutorial, do mention it in the comment section of this tutorial, and we’ll have our experts answer them for you.
+
+Happy Learning! 
+
+-----------------------------------------------------------------------------------------------------------------------------------------------
+
+Beginner-Level PHP Interview Questions
+Let us now begin with the basic PHP interview questions and answers.
+
+1. Who do we know as the father of PHP?
+Rasmus Lerdorf who created the language in 1994. 
+
+2. What did the acronym PHP originally stand for?
+Initially, PHP stood for Personal Home Page, but it now stands for the recursive acronym for PHP: Hypertext Preprocessor.
+
+3. What are some of the common applications of PHP?
+PHP is commonly used to perform −
+
+system functions. It can create, open, read, write, and close to files on a system.
+handling forms. It can help. Collect data from files, save data to a file, send data through email, return data to the user, etc.
+tasks that involve adding, deleting, and modify elements within your database
+accessing cookies variables and set cookies. 
+user restriction to access some pages of your website 
+data encryption
+4. What is the recommended PHP version?
+The latest versions of PHP are 7.2.30, 7.3.17, and 7.4.5, which was released in April 2020
+
+5. Which programming language is PHP similar to?
+PHP is influenced by Perl and C. As such, PHP syntax resembles these languages. 
+
+6. What is the PHP scripting engine called?
+PHP is powered by the scripting engine Zend Engine 2.
+
+7. What is the main difference between PHP4 and PHP5?
+PHP4 uses Zend Engine 1 and doesn't support the OOPs concept, while PHP5 supports the OOPs concept and uses Zend Engine 2.
+
+8. Is PHP a case sensitive language?
+Not fully. PHP is partly a case sensitive language where the variable names are case-sensitive but function names are not. Also, user-defined functions aren’t case sensitive but the rest of the language is.
+
+9. What are the popular frameworks in PHP?
+Some popular PHP frameworks are:
+
+CodeIgniter
+CakePHP
+Symfony
+Zend Framework
+Yii 2
+10. Name the popular Content Management Systems (CMS) in PHP.
+WordPress
+Joomla
+Magento
+Drupal
+Intermediate-Level PHP Interview Questions
+Let us now go through the intermediate PHP interview questions and answers.
+
+11. How can PHP interact with HTML?
+PHP is designed to interact with HTML. It’s possible to embed PHP scripts in an HTML page without a problem and transfer information from HTML to PHP.
+
+12. How can you embed PHP code in an HTML page?
+When embedding PHP code with an HTML file, we must use the .php file extension for that file. This allows your webserver to send the file to PHP for processing. If the webserver is configured to use a different extension for PHP files, that extension must be used instead.
+
+We need to use PHP start and end tags to tell the web server where the PHP code starts and ends. There are three styles of start and end tags that PHP parser recognizes.
+
+XML style – Mostly used when when merging PHP with XML or HTML documents
+<? php 
+
+PHP code
+
+?>
+
+Short style – This is the simplest type, though it is not recommended to avoid interference with XML document declarations.
+<?    
+
+PHP code goes here 
+
+?>
+
+Long style - This style is the longest and matches the tag style used with JavaScript. 
+<script language="php"> 
+
+PHP code 
+
+</script>
+
+13. How does PHP interact with Javascript?
+Because PHP is a server-side language and Javascript is a client-side language, these two cannot interact. But we can exchange variables since it’s possible to generate Javascript code via PHP, which can be executed by the browser and specific variables can be passed back to PHP via the URL.
+
+14. Name the different types of variables in PHP.
+There are eight data types used to construct variables in PHP −
+
+Integers − these are whole numbers without a decimal point, like 4195.
+Doubles − are floating-point numbers, like 3.14159 or 49.1.
+Booleans – come with only possible values of either true or false. 
+NULL − is a special type with only one value: NULL. 
+Strings − are sequences of characters. 
+Arrays − are named and indexed set of other values. 
+Objects − are f programmer-defined classes, which can include both other kinds of values and functions that are specific to the class. 
+Resources − are special variables that refer to resources external to PHP (such as database connections).
+15. List the main types of errors in PHP and explain their differences.
+There are three main error types in PHP:
+
+Notices. These are non-critical errors that can occur during the script execution. These are not visible to users. Accessing an undefined variable is an example of a 'Notice'.
+Warnings. These are more critical than Notices, but just like them, Warnings don't interrupt the script execution. However, these are visible to the user by default. Example: include() a file that doesn't exist.
+Fatal. This is the most critical error type which, when occurs, immediately terminates the script execution. Accessing a property of a non-existent object or require() a non-existent file is an example of this error type
+16. What are 'Traits'?
+A mechanism that lets you create reusable code in PHP and similar languages where multiple inheritances are not supported is called Traits. It's not possible to instantiate it on its own.
+
+17. Can the value of a constant change during the script’s execution?
+No, the value of a constant cannot be changed once it’s declared during the PHP execution.
+
+18. Name and define the three scope levels available in PHP.
+Private – Detectable only in its own class
+Public – Can be seen by any other code accessing the class
+Protected – Can be seen by classes parent(s) and classes that extend the current class
+19. What do we mean by ‘escaping to PHP’?
+The PHP parsing engine must be able to distinguish PHP code from other page elements. The mechanism to achieve this is called ‘escaping to PHP’.
+
+20. How many types of an array are there in PHP?
+Three types of an array are present in PHP:
+
+Indexed array, which is an array with a numeric key.
+An associative array is where each key has its specific value.
+A multidimensional array contains one or more arrays within itself.
+Looking forward to becoming a PHP Developer? Then get certified with the Advanced PHP Development Course. Enroll now!
+21. What do we mean by a PSR standard? What is its importance? 
+Because varying coding standards exist between developers and companies, one may run into problems when trying to fix another developer’s code which might have a different structure. That’s where a PSR standard comes in. It standardizes how the code should look, which helps eliminate issues and even syntax errors in some cases.
+
+Advanced-Level PHP interview questions
+We will now look into some of the advanced PHP interview questions and answers.
+
+22. What is the use of the function' imagetypes()'?
+The imagetypes() function is an inbuilt PHP function which is used to give the image types supported by the current version of PHP inbuilt installed library.
+
+23. What is needed to be able to use the image function?
+GD library, which is the inbuilt installed library in PHP, is needed to execute image functions.
+
+24. How do you handle failures in execution with include() and require() functions?
+If the function requires () fails to access the file, then it ends with a 'fatal' error. However, in case of the include() function, it gives a warning, and the PHP script continues to run.
+
+25. What is the main difference between require() and require_once()?
+require(), and require_once() basically perform the same task. The difference is that the latter checks whether the PHP script is already included or not before executing it.
+
+26. What is the primary difference between include_once() and include()?
+Same as above.
+
+27. How do you display text with a PHP script?
+There are two ways to do this:
+
+<!--?php echo "Method 1"; print "Method 2"; ?-->
+
+28. How do we use PHP to display information of a variable that's readable by a human?
+To achieve this result, we need to use print_r().
+
+29. How do we set an infinite execution time for PHP script?
+We add a set_time_limit(0) at the start of a script to make the time of execution infinite. This helps to prevent the PHP error of 'maximum execution time exceeded.' We can also specify this in the php.ini file.
+
+30. Explain the PHP error 'Parse error in PHP - unexpected T_variable at line x'.
+This is a syntax error in PHP which tells us that a mistake at the line x stops parsing and executing the program.
+
+31. How to export data into an Excel file?
+Commonly, the data is obtained in a format supported by Excel. For instance, we can write a .csv file, select a separator between fields (a comma for example), and then proceed to open the file with Excel.
+
+32. How to execute a PHP script from the command line?
+To execute a PHP script, we can use the PHP Command Line Interface (CLI) and specify the file name of the script in this way:
+
+PHP script.php
+
+What's Next?
+These were some of the common PHP interview questions that hiring companies are most likely to ask during their interview process. We hope these PHP interview questions for freshers as well as professionals will help you regardless of whether you’re about to start your PHP career or are ready to take it to the next level.  
+
+If you’re serious about a PHP development career and want to answer your PHP interview questions more confidently, you’d want to master this language and get more in-depth answers to these questions. As such, getting an industry-standard PHP development training will steer you in the right direction.  
+
+Get Your Programming Career on the Right Track With PHP Training 
+Simplilearn offers you a convenient and easy-to-learn PHP Training Course which comes with a blended learning delivery model, an enterprise-grade Learning Management System, 24x7 learner assistance and support. Plus, the course completion certificate that you receive after successfully completing our PHP Training Course is a feather on your cap which gives you an edge in today’s competition. 
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Advantages of Using GET Method
+Some of the advantages of using the GET Method are:
+
+Since the FORM data sent by the GET Method is appended in the URL, the webpage can be bookmarked with specific query string values.
+Any request made using GET Method remains in the browser history.
+GET Method requests can be cached.
+Disadvantages of Using GET Method
+Some of the disadvantages of using this method are:
+
+Since the data sent by the GET method is displayed in the URL of the webpage, it is not recommended to use GET Method while sending sensitive information.
+The GET method has a limitation of 2048 characters while sending data.
+PHP GET Method With an Example
+To understand how $_GET collects data, you must create a simple FORM with two fields- name and age and collect and display that data using the GET Method.
+
+<?php
+
+    // Below code checks if Name and Age have values. 
+
+   if(isset($_GET["name"]) || isset($_GET["age"]) ) {
+
+      echo "Hi ". $_GET['name']. "<br />";
+
+      echo "Age: ". $_GET['age']. " years old.";
+
+      exit();
+
+   }
+
+?>
+
+<html>
+
+   <body>
+
+      <form action = "<?php $_PHP_SELF ?>" method = "GET">
+
+         Name: <input type = "text" name = "name" />
+
+         Age: <input type = "text" name = "age" />
+
+         <input type = "submit" />
+
+      </form>     
+
+   </body>
+
+</html>
+
+In the above code, the form method has been set to GET and the PHP script collects the data using $_GET superglobal variable.
+
+Below is the form with the name and age fields. Notice the URL before submitting the form does not contain any information.
+
+PHP_GET_1
+
+Now, look at the URL of the webpage after submitting the form using the GET Method.
+
+PHP_GET_2
+
+As you can notice in the URL, it displays the information submitted in the form after the ‘?’ symbol.
+
+This is how the GET Method is used to collect and display information.
+
+Looking forward to becoming a PHP Developer? Then get certified with the Advanced PHP Development Course. Enroll now!
+
+-----------------------------------------------------------------------------------------------------------------------------------------------------
+
+Software Requirements for the Tutorial
+To set up the PHP development environment, you mainly need two software, a code editor and a web server package.
+
+You will be using:
+
+Visual Studio Code as the code editor.
+And XAMPP to set up your local web server.
+Now that you know the prerequisites for this tutorial as well and the software requirements, it’s time to move on to creating a database.
+
+How to Create a Database?
+A database is defined as an organized collection of data that makes the data easy to access, manage and modify. Generally, databases use SQL (Structured Query Language) for data manipulation.
+
+To create a database:
+
+1. Open XAMPP Control Panel and start the Apache server and MySQL service.
+
+/PHP_With_MySQL_1.
+
+2. Now, go to your browser and type localhost in the address bar, and then on the XAMPP dashboard, click on the phpmyadmin tab.
+
+PHP_With_MySQL_2.
+PHP_With_MySQL_3
+
+3. Into the phpmyadmin section, click on new to create a new database. Here, name your database “tutorial”.
+
+PHP_With_MySQL_4
+
+PHP_With_MySQL_5
+
+4. Now, create a table named “users” and create 6 columns as shown below, which you will use on the registration page.
+
+PHP_With_MySQL_6
+
+Keep the “id” column as Auto Incremented by clicking the check box next to ‘AI’ since it will be the primary key.
+
+How to Create a Registration Page?
+To create a registration, first, create a folder named “demo” inside htdocs and then open it inside the code editor i.e, Visual Studio Code.
+
+Now, create a file named “register.php” and write the following code.
+
+<?php 
+
+include "config.php";
+
+  if (isset($_POST['submit'])) {
+
+    $first_name = $_POST['firstname'];
+
+    $last_name = $_POST['lastname'];
+
+    $email = $_POST['email'];
+
+    $password = $_POST['password'];
+
+    $gender = $_POST['gender'];
+
+    $sql = "INSERT INTO `users`(`firstname`, `lastname`, `email`, `password`, `gender`) 
+
+           VALUES ('$first_name','$last_name','$email','$password','$gender')";
+
+    $result = $conn->query($sql);
+
+    if ($result == TRUE) {
+
+      echo "New record created successfully.";
+
+    }else{
+
+      echo "Error:". $sql . "<br>". $conn->error;
+
+    }
+
+    $conn->close();
+
+  } 
+
+?> 
+
+<!DOCTYPE html>
+
+<html>
+
+<body>
+
+<h2>Registration Form</h2> 
+
+<form action="" method="POST">
+
+  <fieldset>
+
+    <legend>Information:</legend>
+
+    First name:<br>
+
+    <input type="text" name="firstname">
+
+    <br>
+
+    Last name:<br>
+
+    <input type="text" name="lastname">
+
+    <br>
+
+    Email:<br>
+
+    <input type="email" name="email">
+
+    <br>
+
+    Password:<br>
+
+    <input type="password" name="password">
+
+    <br>
+
+    Gender:<br>
+
+    <input type="radio" name="gender" value="Male">Male
+
+    <input type="radio" name="gender" value="Female">Female
+
+    <br><br>
+
+    <input type="submit" name="submit" value="submit">
+
+  </fieldset>
+
+</form> 
+
+</body>
+
+</html>
+
+That’s it. Now you just need to connect this webpage with the database.
+
+How to Connect Webpage to the Database Using PHP?
+To connect the webpage to the database, create another file in the code editor named “config.php” and write the following code.
+
+<?php
+
+    $servername = "localhost";
+
+    $username = "root";
+
+    $password = "";
+
+    $dbname = "tutorial"; 
+
+    $conn = new mysqli($servername, $username, $password, $dbname);
+
+    if($conn->connect_error) {
+
+        die("Connection Failed" . $conn->connect_error);
+
+    }
+
+?>
+
+Now that you have the registration page ready and connected to the database, open the browser for the output.
+
+Open the browser and type “localhost/demo/register.php”. Fill in the required fields and click on “submit”.
+PHP_With_MySQL_7
+
+Now, go to the “users” table in the phpmyadmin panel and check for the data.
+PHP_With_MySQL_8
+
+As you can see, the records are visible in the table “users”.
+
+Now you know how to create a database and link it to a webpage. You will now see how to edit or delete the fields from the phpmyadmin control panel.
+
+How to Edit and Delete Data From the Database?
+Once data has been entered into the database, you can open the phpmyadmin panel from the XAMPP dashboard and locate to the table “users” where every information entered into the table is visible.
+
+Here, with every data, there exists an edit and delete option which can be used to update or delete any desired data from the table.
+
+PHP_With_MySQL_9
+
+Advance your career as a MEAN stack developer with the Full Stack Web Developer - MEAN Stack Master's Program. Enroll now!
+Conclusion
+This brings us to the end of the “PHP with MySQL” tutorial. In this, you have learned how to create a database using XAMPP and MySQL and also create a registration page with the help of PHP. In the later sections, you learned how to connect the webpage to the database and then finally how to edit and delete the entries in the table using the phpmyadmin panel.
+
+You can refer here for a video tutorial on the same. If you wish to learn more about PHP and Web Development check out the PostGraduate Program in Web Development offered by Simplilearn in collaboration with Caltech where you'll learn modern coding techniques with boot camp-level intensity and gain all you need to be a full-stack technologist.
+
+If you have any queries regarding the PHP with MySQL tutorial, do mention them in the comment section of this tutorial, and we’ll have our experts answer them for you.
+
+Happy Learning! 
+
+
+
